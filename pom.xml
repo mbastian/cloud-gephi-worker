@@ -28,12 +28,6 @@
         <cloud.junit.version>4.7</cloud.junit.version>
         <cloud.test.maxMemory>768M</cloud.test.maxMemory>
         <cloud.test.reportsDirectory>${project.build.directory}/surefire-reports/plain</cloud.test.reportsDirectory>
-        
-        <!-- Repository URLs -->
-        <cloud.release.repository.id>gephi-nexus</cloud.release.repository.id>
-        <cloud.snapshot.repository.id>gephi-nexus</cloud.snapshot.repository.id>
-        <cloud.release.repository.url>http://nexus.cloud.org/nexus/content/repositories/releases</cloud.release.repository.url>
-        <cloud.snapshot.repository.url>http://nexus.cloud.org/nexus/content/repositories/snapshots</cloud.snapshot.repository.url>
     </properties>
 
     <!-- Maven required version -->
@@ -103,23 +97,6 @@
         </repository>
     </repositories>
     
-    <!-- Locations of the artifacts published -->
-    <distributionManagement>
-        <!-- Publish versioned releases here -->
-        <repository>
-            <id>${cloud.release.repository.id}</id>
-            <name>Gephi Release Repository</name>
-            <url>${cloud.release.repository.url}</url>
-        </repository>
- 
-        <!-- Publish snapshots here -->
-        <snapshotRepository>
-            <id>${cloud.release.repository.id}</id>
-            <name>Gephi Snapshot Repository</name>
-            <url>${cloud.snapshot.repository.url}</url>
-        </snapshotRepository>
-    </distributionManagement>
-    
     <build>
         <pluginManagement>
             <plugins>
@@ -147,6 +124,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId> 
                     <version>2.5</version> 
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.3</version>   
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -199,7 +181,30 @@
                         </configuration> 
                     </execution>
                 </executions> 
-            </plugin> 
+            </plugin>
+            
+            <!-- Assembly -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>   
+                <executions>		
+                    <execution>
+                        <id>all</id>
+                        <configuration>
+                            <descriptor>src/main/assembly/jar.xml</descriptor>
+                            <archive>
+                                <manifest>
+                                    <mainClass>org.gephi.cloud.worker.Worker</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

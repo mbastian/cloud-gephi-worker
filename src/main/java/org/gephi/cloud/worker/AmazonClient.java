@@ -195,6 +195,10 @@ public class AmazonClient {
     public void cleanFile(String key, String bucket) {
         s3Client.deleteObject(bucket, key);
     }
+    
+    public void deleteBucket(String bucket) {
+        s3Client.deleteBucket(bucket);
+    }
 
     public void finishUploads() {
         for (Upload u : uploads.toArray(new Upload[0])) {

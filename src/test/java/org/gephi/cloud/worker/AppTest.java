@@ -38,10 +38,14 @@ public class AppTest extends TestCase {
      */
     public void testApp() {
         try {
-            //Load Properties with credentials
-            Worker worker = new Worker();
-            Properties properties = worker.getProperties();
-            AmazonClient awsClient = new AmazonClient(properties);
+            Properties properties = new Properties();
+            properties.setProperty("input_bucket_name", "cloudgephitestinput");
+            properties.setProperty("output_bucket_name", "cloudgephitestoutput");
+            properties.setProperty("input_queue_url", "https://queue.amazonaws.com/992095333379/cloudgephijobstest");
+            properties.setProperty("output_queue_url", "https://queue.amazonaws.com/992095333379/cloudgephicallbackstest");
+            Worker worker = new Worker(properties);
+
+            AmazonClient awsClient = new AmazonClient(worker.getProperties());
 
             //Clean files
             awsClient.cleanFile("foo/sample.gexf", awsClient.getInputBucketName());
@@ -57,8 +61,9 @@ public class AppTest extends TestCase {
             awsClient.finishUploads();
 
             //Send message on the inputqueue
-            JobMessage job = new JobMessage(JobMessage.MessageType.RENDER, "foo/sample.gext", null);
+            JobMessage job = new JobMessage(JobMessage.MessageType.RENDER, "foo/sample.gexf", null);
             String serializedMessage = worker.serializeJob(job);
+            Logger.getLogger(AppTest.class.getName()).log(Level.INFO, "Sending message: {0}", serializedMessage);
             awsClient.sendMessages(serializedMessage, awsClient.getInputQueueUrl());
 
             //Wait a little bit so the message is in the input queue
@@ -80,7 +85,7 @@ public class AppTest extends TestCase {
             assertEquals(1, msgs.size());
             Message msg = msgs.get(0);
             assertEquals(serializedMessage, msg.getBody());
-            
+
         } catch (InterruptedException ex) {
             Logger.getLogger(AppTest.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

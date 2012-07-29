@@ -4,6 +4,7 @@ import com.amazonaws.services.sqs.model.Message;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +32,17 @@ public class Worker {
         awsClient = new AmazonClient(properties);
     }
 
+    public Worker(Properties props) {
+        //Load properties
+        properties = loadProperties();
+        for (Entry<Object, Object> e : props.entrySet()) {
+            properties.put(e.getKey(), e.getValue());
+        }
+
+        //Init Amazon Client
+        awsClient = new AmazonClient(properties);
+    }
+
     /**
      * Continuously run the worker and pull messages every second
      */
@@ -43,7 +55,7 @@ public class Worker {
         awsClient.finishUploads();
         awsClient.shutdownNow();
     }
-    
+
     public void run() {
         //Coninuously pull and process messages
         List<Message> messages = awsClient.getMessages(awsClient.getInputQueueUrl());
@@ -64,14 +76,14 @@ public class Worker {
         } catch (InterruptedException ex) {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         logger.log(Level.INFO, "Stopping worker...");
     }
-    
+
     public void stop() {
         stop = true;
     }
-    
+
     private void processMessage(Message message) {
         try {
             //Unserialize job message
@@ -90,20 +102,20 @@ public class Worker {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public String serializeJob(JobMessage job) throws IOException {
         StringWriter writer = new StringWriter();
         mapper.writeValue(writer, job);
         return writer.toString();
     }
-    
+
     public JobMessage unserializeJob(String jobString) throws IOException {
         return mapper.readValue(jobString, JobMessage.class);
     }
-    
+
     private Properties loadProperties() {
         Properties prop = new Properties();
-        
+
         try {
             //load a properties file
             prop.load(getClass().getResourceAsStream("/aws.properties"));
@@ -113,13 +125,13 @@ public class Worker {
         }
         return null;
     }
-    
+
     public Properties getProperties() {
         return properties;
     }
-    
+
     public static void main(String[] args) {
         Worker app = new Worker();
-        app.run();
+        app.runContinuously();
     }
 }
