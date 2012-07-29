@@ -1,0 +1,5 @@
+#!/bin/bash 
+
+home_dir=$PWD
+java -Xmx512m -jar ../target/cloud.worker-0.1-SNAPSHOT-all.jar
+
