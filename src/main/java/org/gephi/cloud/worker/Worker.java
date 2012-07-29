@@ -60,7 +60,7 @@ public class Worker {
         //Coninuously pull and process messages
         List<Message> messages = awsClient.getMessages(awsClient.getInputQueueUrl());
         while (messages != null && !messages.isEmpty()) {
-            logger.log(Level.INFO, "Worker received {0} messages to process. Starting... ", messages.size());
+//            logger.log(Level.INFO, "Worker received {0} messages to process. Starting... ", messages.size());
             for (Message message : messages) {
                 String msg = message.getBody();
                 logger.log(Level.INFO, "Starting processing message={0}", msg.substring(0, Math.min(msg.length(), 100)));
@@ -71,13 +71,13 @@ public class Worker {
             messages = awsClient.getMessages(awsClient.getInputQueueUrl());
         }
         try {
-            logger.log(Level.INFO, "Now sleeping {0} ms", DELAY);
+//            logger.log(Level.INFO, "Now sleeping {0} ms", DELAY);
             Thread.sleep(DELAY);
         } catch (InterruptedException ex) {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        logger.log(Level.INFO, "Stopping worker...");
+//        logger.log(Level.INFO, "Stopping worker...");
     }
 
     public void stop() {

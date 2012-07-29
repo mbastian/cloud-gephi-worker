@@ -109,8 +109,6 @@ public class AmazonClient {
         rmr.setVisibilityTimeout(300);
         ReceiveMessageResult result = sqsClient.receiveMessage(rmr);
         List<Message> msgs = result.getMessages();
-        logger.log(Level.INFO, "Pulled {0} messages from the {1} queue", new Object[]{msgs.size(), queue});
-
         return msgs;
     }
 
@@ -119,7 +117,6 @@ public class AmazonClient {
             DeleteMessageRequest dmr = new DeleteMessageRequest(queue, m.getReceiptHandle());
             sqsClient.deleteMessage(dmr);
         }
-        logger.log(Level.INFO, "Deleted {0} messages from the {1} queue", new Object[]{messages.size(), queue});
     }
 
     /**
