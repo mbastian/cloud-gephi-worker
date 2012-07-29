@@ -106,15 +106,20 @@ public class AmazonClient {
     public List<Message> getMessages(String queue) {
         ReceiveMessageRequest rmr = new ReceiveMessageRequest(queue);
         rmr.setMaxNumberOfMessages(NUM_MESSAGES);
-        rmr.setVisibilityTimeout(10000);
+        rmr.setVisibilityTimeout(300);
         ReceiveMessageResult result = sqsClient.receiveMessage(rmr);
         List<Message> msgs = result.getMessages();
         logger.log(Level.INFO, "Pulled {0} messages from the {1} queue", new Object[]{msgs.size(), queue});
-        for (Message m : msgs) {
+
+        return msgs;
+    }
+
+    public void deleteMessages(List<Message> messages, String queue) {
+        for (Message m : messages) {
             DeleteMessageRequest dmr = new DeleteMessageRequest(queue, m.getReceiptHandle());
             sqsClient.deleteMessage(dmr);
         }
-        return msgs;
+        logger.log(Level.INFO, "Deleted {0} messages from the {1} queue", new Object[]{messages.size(), queue});
     }
 
     /**

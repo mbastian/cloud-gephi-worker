@@ -43,7 +43,7 @@ public class Worker {
         awsClient.finishUploads();
         awsClient.shutdownNow();
     }
-
+    
     public void run() {
         //Coninuously pull and process messages
         List<Message> messages = awsClient.getMessages(awsClient.getInputQueueUrl());
@@ -55,6 +55,7 @@ public class Worker {
                 processMessage(message);
                 logger.log(Level.INFO, "End processing");
             }
+            awsClient.deleteMessages(messages, awsClient.getInputQueueUrl());
             messages = awsClient.getMessages(awsClient.getInputQueueUrl());
         }
         try {
@@ -63,14 +64,14 @@ public class Worker {
         } catch (InterruptedException ex) {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
         logger.log(Level.INFO, "Stopping worker...");
     }
-
+    
     public void stop() {
         stop = true;
     }
-
+    
     private void processMessage(Message message) {
         try {
             //Unserialize job message
@@ -89,20 +90,20 @@ public class Worker {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     public String serializeJob(JobMessage job) throws IOException {
         StringWriter writer = new StringWriter();
         mapper.writeValue(writer, job);
         return writer.toString();
     }
-
+    
     public JobMessage unserializeJob(String jobString) throws IOException {
         return mapper.readValue(jobString, JobMessage.class);
     }
-
+    
     private Properties loadProperties() {
         Properties prop = new Properties();
-
+        
         try {
             //load a properties file
             prop.load(getClass().getResourceAsStream("/aws.properties"));
@@ -112,11 +113,11 @@ public class Worker {
         }
         return null;
     }
-
+    
     public Properties getProperties() {
         return properties;
     }
-
+    
     public static void main(String[] args) {
         Worker app = new Worker();
         app.run();

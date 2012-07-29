@@ -70,12 +70,13 @@ public class AppTest extends TestCase {
             //Look for result file on S3
             String resultStr = new String(awsClient.download("foo/result.txt", awsClient.getOutputBucketName()));
             assertEquals("foo", resultStr);
-            
+
             //Wait a little bit so the message is in the output queue
             Thread.sleep(2000);
 
             //Look if received message on output queue
             List<Message> msgs = awsClient.getMessages(awsClient.getOutputQueueUrl());
+            awsClient.deleteMessages(msgs, awsClient.getOutputQueueUrl());
             assertEquals(1, msgs.size());
             Message msg = msgs.get(0);
             assertEquals(serializedMessage, msg.getBody());
