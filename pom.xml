@@ -25,7 +25,7 @@
         <cloud.javac.fork>true</cloud.javac.fork>
         
         <!-- Testing settings -->
-        <cloud.junit.version>4.7</cloud.junit.version>
+        <cloud.junit.version>4.13.1</cloud.junit.version>
         <cloud.test.maxMemory>768M</cloud.test.maxMemory>
         <cloud.test.reportsDirectory>${project.build.directory}/surefire-reports/plain</cloud.test.reportsDirectory>
     </properties>
